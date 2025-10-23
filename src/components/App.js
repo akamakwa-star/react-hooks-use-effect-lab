@@ -1,41 +1,42 @@
 import React, { useState } from "react";
 import Question from "./Question";
-import quiz from "../data/quiz";
 
-function App() {
-  const [questions, setQuestions] = useState(quiz);
-  const [currentQuestionId, setCurrentQuestion] = useState(1);
-  const [score, setScore] = useState(0);
-  const currentQuestion = questions.find((q) => q.id === currentQuestionId);
+const questions = [
+  {
+    id: 1,
+    prompt: "What is the capital of France?",
+    answers: ["Berlin", "London", "Paris", "Madrid"],
+  },
+  {
+    id: 2,
+    prompt: "What is 2 + 2?",
+    answers: ["3", "4", "5", "6"],
+  },
+];
 
-  function handleQuestionAnswered(correct) {
-    if (currentQuestionId < questions.length) {
-      setCurrentQuestion((currentQuestionId) => currentQuestionId + 1);
+export default function App() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [message, setMessage] = useState("");
+
+  function handleAnswered(didAnswer) {
+    if (didAnswer) {
+      setMessage("You answered correctly!");
     } else {
-      setCurrentQuestion(null);
+      setMessage("Time ran out! Moving to next question.");
     }
-    if (correct) {
-      setScore((score) => score + 1);
-    }
+
+    // Move to next question after 1 second
+    setTimeout(() => {
+      setMessage("");
+      setCurrentIndex((idx) => (idx + 1) % questions.length);
+    }, 1000);
   }
 
   return (
-    <main>
-      <section>
-        {currentQuestion ? (
-          <Question
-            question={currentQuestion}
-            onAnswered={handleQuestionAnswered}
-          />
-        ) : (
-          <>
-            <h1>Game Over</h1>
-            <h2>Total Correct: {score}</h2>
-          </>
-        )}
-      </section>
-    </main>
+    <div style={{ padding: 20 }}>
+      <h1>Trivia App</h1>
+      <Question question={questions[currentIndex]} onAnswered={handleAnswered} />
+      {message && <p>{message}</p>}
+    </div>
   );
 }
-
-export default App;
